@@ -26,9 +26,14 @@ export function runSession(root, items, opts) {
   const answers = [];
 
   setKeyHandler((e) => {
-    if (e.target.closest('input, textarea, select, .CodeMirror') || e.ctrlKey || e.metaKey || e.altKey) return;
+    const el = e.target instanceof Element ? e.target : null;
+    if (el?.closest('input, textarea, select, .CodeMirror') || e.ctrlKey || e.metaKey || e.altKey) return;
     if (!answered && /^[1-9]$/.test(e.key)) root.querySelectorAll('.option')[Number(e.key) - 1]?.click();
-    else if (answered && (e.key === 'Enter' || e.key === 'ArrowRight')) { e.preventDefault(); next(); }
+    else if (answered && (e.key === 'Enter' || e.key === 'ArrowRight')) {
+      if (el?.closest('a, button')) return;
+      e.preventDefault();
+      next();
+    }
   });
 
   function show() {
@@ -102,7 +107,9 @@ export function runSession(root, items, opts) {
       h('p', { class: 'muted' }, `+${xp} XP this session`),
       opts.mode === 'exam' ? h('table', { class: 'breakdown' },
         h('thead', {}, h('tr', {}, h('th', {}, 'Module'), h('th', {}, 'Score'), h('th', {}, ''))),
-        h('tbody', {}, Object.entries(sum.byModule).map(([id, r]) => h('tr', {},
+        h('tbody', {}, Object.entries(sum.byModule)
+          .sort(([a], [b]) => MODULES.findIndex((m) => m.id === a) - MODULES.findIndex((m) => m.id === b))
+          .map(([id, r]) => h('tr', {},
           h('td', {}, titleOf(id)), h('td', {}, `${r.correct}/${r.total}`),
           h('td', {}, r.correct / r.total < 0.7 ? h('a', { href: `#/m/${id}/lesson` }, 'Revisit →') : '✓'))))) : null,
       missedItems.length ? h('div', { class: 'missed' }, h('h3', {}, 'Questions to revisit'),

@@ -6,6 +6,10 @@ import { runSession, stopKeys } from './quiz.js';
 import { shuffle } from '../quiz-session.js';
 
 export function render(root) {
+  const missing = reviewQueue(store.get()).filter((id) => !findQuestion(id));
+  if (missing.length) {
+    store.update((st) => ({ ...st, review: Object.fromEntries(Object.entries(st.review).filter(([id]) => !missing.includes(id))) }));
+  }
   const s = store.get();
   const items = reviewQueue(s).map(findQuestion).filter(Boolean).map(({ q, module }) => ({ q, moduleId: module.id }));
   root.append(h('header', { class: 'page-head' },
