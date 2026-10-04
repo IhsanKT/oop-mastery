@@ -253,3 +253,10 @@ body[data-lang='cpp'] .pane-python, body[data-lang='python'] .pane-cpp { display
 .stdout pre { padding: 12px; border-radius: 10px; background: var(--surface-2); white-space: pre-wrap; }
 .solution { margin-top: 24px; padding: 4px 20px 16px; border-radius: var(--radius); border: 1px solid var(--ok); background: var(--surface); }
 @media (max-width: 960px) { .lab-layout { grid-template-columns: 1fr; } .lab-list { position: static; flex-direction: row; overflow-x: auto; } .lab-item { min-width: 200px; } }
+
+/* settings */
+.settings-section { max-width: 760px; margin-bottom: 18px; padding: 20px 24px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--border); }
+.settings-section h2 { margin: 0 0 4px; font-size: 18px; }
+.radios { display: flex; gap: 8px 20px; flex-wrap: wrap; margin-top: 10px; }
+.radio { display: flex; gap: 8px; align-items: center; cursor: pointer; }
+.radio input { accent-color: var(--accent); width: 18px; height: 18px; }
