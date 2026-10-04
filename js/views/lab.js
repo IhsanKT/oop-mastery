@@ -131,23 +131,22 @@ export function render(root, { module, exercises, exId }) {
       runBtn.textContent = 'Run tests';
       status.textContent = '';
     }
+    const firstPass = r.ok && !st().passed;
+    if (r.ok) gain((s) => markPassed(s, ex.id));
+    else gain((s) => ({ state: s, xpGained: 0 })); // still counts toward the daily streak
     if (!root.isConnected) return;
     showResults(r);
     if (r.ok) {
-      const firstPass = !st().passed;
-      gain((s) => markPassed(s, ex.id));
       if (firstPass) showSolution(true);
       nextBox.hidden = false;
       list.querySelector(`[data-id="${ex.id}"] .lab-status`).textContent = '✓';
-    } else {
-      gain((s) => ({ state: s, xpGained: 0 })); // still counts toward the daily streak
     }
   }
 
   runBtn.addEventListener('click', run);
   hintBtn.addEventListener('click', () => { store.update((s) => useHint(s, ex.id)); renderHints(); });
   revealBtn.addEventListener('click', () => {
-    if (st().passed) return showSolution(true);
+    if (st().passed || st().solutionRevealed) return showSolution(!!st().passed);
     if (!window.confirm('Reveal the model solution? This lab will then award 0 XP.')) return;
     store.update((s) => revealSolution(s, ex.id));
     showSolution(false);
@@ -155,7 +154,9 @@ export function render(root, { module, exercises, exId }) {
   resetBtn.addEventListener('click', () => {
     if (!window.confirm('Reset the editor to the starter code? Your current code will be lost.')) return;
     editor.set(ex.starter);
+    clearTimeout(saveTimer);
     removeCode(ex.id);
+    results.replaceChildren();
   });
 
   renderHints();
