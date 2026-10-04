@@ -75,7 +75,14 @@ export function mapCppDiagnostics(text, userStartLine, userLineCount) {
       if (line >= userStartLine + userLineCount) return 'test code';
       return `your code:${line - userStartLine + 1}${c ? `:${c}` : ''}`;
     })
-    .replace(new RegExp(`${FILE_RE}:(?=\\s)`, 'g'), 'your program:');
+    .replace(new RegExp(`${FILE_RE}:(?=\\s)`, 'g'), 'your program:')
+    .replace(/^(\s*)(\d+)( \| )/gm, (m, pad, n, bar) => {
+      const line = Number(n);
+      if (line < userStartLine || line >= userStartLine + userLineCount) return m;
+      const mapped = String(line - userStartLine + 1);
+      const width = pad.length + n.length;
+      return `${mapped.padStart(width)}${bar}`;
+    });
 }
 
 export const hasCompileError = (text) => /(^|[\s:])(fatal )?error:/m.test(text || '');

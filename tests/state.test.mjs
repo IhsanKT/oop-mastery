@@ -137,7 +137,7 @@ test('awardBadges returns only new badges', () => {
 test('importState validates and exportState round-trips', () => {
   const s = { ...S.defaultState(), xp: 7 };
   assert.equal(S.importState(S.exportState(s)).xp, 7);
-  assert.throws(() => S.importState('nope'));
+  assert.throws(() => S.importState('nope'), /progress file/);
   assert.throws(() => S.importState('{"foo":1}'), /progress file/);
 });
 

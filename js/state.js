@@ -175,7 +175,13 @@ export function save(state, storage) {
 export const exportState = (state) => JSON.stringify(state, null, 2);
 
 export function importState(json) {
-  const raw = JSON.parse(json);
+  let raw;
+  try {
+    raw = JSON.parse(json);
+  } catch (e) {
+    if (e instanceof SyntaxError) throw new Error('Not an OOP Mastery progress file');
+    throw e;
+  }
   if (!isObj(raw) || raw.version !== 1) throw new Error('Not an OOP Mastery progress file');
   return mergeState(raw);
 }

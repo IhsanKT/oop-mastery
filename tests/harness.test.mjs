@@ -107,6 +107,13 @@ test('normalizePythonResult maps the harness JSON', () => {
   assert.equal(all.ok, true);
 });
 
+test('mapCppDiagnostics remaps source-excerpt gutter line numbers', () => {
+  assert.equal(
+    H.mapCppDiagnostics('   42 |     int x\n      |     ^', 40, 5),
+    '    3 |     int x\n      |     ^',
+  );
+});
+
 test('PY_HARNESS defines run_all and capture', () => {
   assert.match(H.PY_HARNESS, /def run_all\(payload_json\):/);
   assert.match(H.PY_HARNESS, /def capture\(fn/);
