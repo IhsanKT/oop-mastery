@@ -13,6 +13,7 @@ const VIEWS = { home, module: moduleView, review, exam, settings };
 const app = document.getElementById('app');
 const darkQuery = matchMedia('(prefers-color-scheme: dark)');
 let cleanup = null;
+let booted = false;
 
 export function applyTheme(theme) {
   const dark = theme === 'dark' || (theme === 'auto' && darkQuery.matches);
@@ -48,9 +49,18 @@ async function onRoute(route) {
     root.append(h('section', { class: 'empty' }, h('h1', {}, 'Page not found'), h('a', { class: 'btn', href: '#/' }, 'Back to the dashboard')));
     return;
   }
-  const result = await view.render(root, route.params);
-  if (typeof result === 'function') {
-    if (root.isConnected) cleanup = result; else result();
+  try {
+    const result = await view.render(root, route.params);
+    if (typeof result === 'function') {
+      if (root.isConnected) cleanup = result; else result();
+    }
+  } catch (err) {
+    console.error(err);
+    if (root.isConnected) {
+      root.replaceChildren(h('section', { class: 'empty' }, h('h1', {}, 'Something went wrong'),
+        h('p', { class: 'muted' }, 'This page failed to load. Try reloading, or go back to the dashboard.'),
+        h('a', { class: 'btn', href: '#/' }, 'Back to the dashboard')));
+    }
   }
 }
 
@@ -62,13 +72,14 @@ async function boot() {
     const lang = e.target.closest('button')?.dataset.lang;
     if (!lang || lang === store.get().settings.lang) return;
     store.update((s) => setSetting(s, 'lang', lang));
-    onRoute(parseRoute(location.hash));
+    if (booted) onRoute(parseRoute(location.hash));
   });
   document.getElementById('theme-toggle').addEventListener('click', () => {
     const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
     store.update((s) => setSetting(s, 'theme', next));
   });
   await loadAllContent();
+  booted = true;
   startRouter(onRoute);
 }
 

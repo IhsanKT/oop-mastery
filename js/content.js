@@ -13,8 +13,11 @@ export async function loadAllContent() {
         import(new URL('quiz.js', base(meta))).then((m) => m.default),
         import(new URL('exercises.js', base(meta))).then((m) => m.default),
       ]);
+      if (!Array.isArray(quiz)) throw new Error('quiz.js must export an array');
+      if (!Array.isArray(exercises)) throw new Error('exercises.js must export an array');
       loaded.set(meta.id, { id: meta.id, meta, quiz, exercises, missing: false });
-    } catch {
+    } catch (err) {
+      console.warn(`Could not load content for module ${meta.id}:`, err);
       loaded.set(meta.id, { id: meta.id, meta, quiz: [], exercises: [], missing: true });
     }
   }));

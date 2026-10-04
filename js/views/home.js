@@ -30,6 +30,7 @@ export function render(root) {
   const s = store.get();
   const lv = levelFor(s.xp);
   const queue = reviewQueue(s).length;
+  const resume = typeof s.lastVisited === 'string' && s.lastVisited.startsWith('#/') ? s.lastVisited : null;
   root.append(
     h('section', { class: 'hero' },
       h('div', { class: 'hero-main' },
@@ -43,7 +44,7 @@ export function render(root) {
         stat('🏅', s.badges.length, 'badges'),
         stat('🔁', queue, 'to review')),
       h('div', { class: 'hero-actions' },
-        h('a', { class: 'btn primary', href: s.lastVisited ?? '#/m/why-oop/lesson' }, s.lastVisited ? 'Continue where you left off' : 'Start with Module 1'),
+        h('a', { class: 'btn primary', href: resume ?? '#/m/why-oop/lesson' }, resume ?'Continue where you left off' : 'Start with Module 1'),
         queue ? h('a', { class: 'btn', href: '#/review' }, `Review ${queue} missed question${queue > 1 ? 's' : ''}`) : null)),
     ...TIERS.map((t) => h('section', { class: 'tier' },
       h('h2', {}, t.title),
