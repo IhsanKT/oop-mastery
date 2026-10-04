@@ -3,7 +3,18 @@ import { MODULES } from '../content/index.js';
 import { validateModule } from './lib/validate.mjs';
 
 const argv = process.argv.slice(2);
-const only = argv.includes('--module') ? argv[argv.indexOf('--module') + 1] : null;
+let only = null;
+if (argv.includes('--module')) {
+  only = argv[argv.indexOf('--module') + 1];
+  if (!only || only.startsWith('--')) {
+    console.error('--module needs a module id');
+    process.exit(1);
+  }
+  if (!MODULES.some((m) => m.id === only)) {
+    console.error(`Unknown module id "${only}". Known ids: ${MODULES.map((m) => m.id).join(', ')}`);
+    process.exit(1);
+  }
+}
 const errors = [];
 const rows = [];
 

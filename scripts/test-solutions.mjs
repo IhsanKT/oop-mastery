@@ -3,7 +3,18 @@ import { MODULES } from '../content/index.js';
 import { runCppLocal, runPythonLocal, runProgramLocal } from './lib/local-runners.mjs';
 
 const argv = process.argv.slice(2);
-const only = argv.includes('--module') ? argv[argv.indexOf('--module') + 1] : null;
+let only = null;
+if (argv.includes('--module')) {
+  only = argv[argv.indexOf('--module') + 1];
+  if (!only || only.startsWith('--')) {
+    console.error('--module needs a module id');
+    process.exit(1);
+  }
+  if (!MODULES.some((m) => m.id === only)) {
+    console.error(`Unknown module id "${only}". Known ids: ${MODULES.map((m) => m.id).join(', ')}`);
+    process.exit(1);
+  }
+}
 const run = (lang, code, tests) => (lang === 'cpp' ? runCppLocal : runPythonLocal)(code, tests);
 const norm = (s) => s.replace(/\r\n/g, '\n').split('\n').map((l) => l.trimEnd()).join('\n').trim();
 const failing = (r) => r.results.filter((x) => x.status !== 'pass').map((x) => `[${x.name}: ${x.status} ${x.message}]`).join(' ');
@@ -30,6 +41,7 @@ for (const meta of MODULES) {
     jobs.push(async () => {
       const r = await run(ex.lang, ex.starter, ex.tests);
       if (r.ok) return `${ex.id}: starter already passes every test, so the tests are too weak`;
+      if (['compile', 'timeout', 'network'].includes(r.phase)) return `${ex.id}: starter does not compile/run (${r.phase}): ${String(r.message).slice(0, 300)}`;
     });
   }
   for (const q of quiz.filter((x) => x.type === 'output')) {
@@ -42,6 +54,11 @@ for (const meta of MODULES) {
       if (q.options.some((o) => !o.correct && norm(o.text) === actual)) return `${q.id}: a wrong option also matches the real output`;
     });
   }
+}
+
+if (jobs.length === 0) {
+  console.error('No checks were run (no loadable content found).');
+  process.exit(1);
 }
 
 const problems = [];
