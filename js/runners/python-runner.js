@@ -59,9 +59,19 @@ export async function runPython(code, tests, { onStatus = () => {} } = {}) {
       if (e.data?.id !== id) return;
       clearTimeout(timer);
       w.removeEventListener('message', onMsg);
-      resolve(e.data.ok
-        ? normalizePythonResult(e.data.json, tests)
-        : { ok: false, phase: 'runtime', message: e.data.error, results: notRun(tests), stdout: '' });
+      let result;
+      try {
+        result = e.data.ok
+          ? normalizePythonResult(e.data.json, tests)
+          : { ok: false, phase: 'runtime', message: e.data.error, results: notRun(tests), stdout: '' };
+      } catch (err) {
+        result = {
+          ok: false, phase: 'runtime',
+          message: 'Unexpected result from the Python runner: ' + (err.message || err),
+          results: notRun(tests), stdout: '',
+        };
+      }
+      resolve(result);
     }
     w.addEventListener('message', onMsg);
     w.postMessage({ id, harness: PY_HARNESS, payload: JSON.stringify({ code, tests }) });
