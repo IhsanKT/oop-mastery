@@ -1,0 +1,66 @@
+import { cpus } from 'node:os';
+import { MODULES } from '../content/index.js';
+import { runCppLocal, runPythonLocal, runProgramLocal } from './lib/local-runners.mjs';
+
+const argv = process.argv.slice(2);
+const only = argv.includes('--module') ? argv[argv.indexOf('--module') + 1] : null;
+const run = (lang, code, tests) => (lang === 'cpp' ? runCppLocal : runPythonLocal)(code, tests);
+const norm = (s) => s.replace(/\r\n/g, '\n').split('\n').map((l) => l.trimEnd()).join('\n').trim();
+const failing = (r) => r.results.filter((x) => x.status !== 'pass').map((x) => `[${x.name}: ${x.status} ${x.message}]`).join(' ');
+
+const jobs = [];
+for (const meta of MODULES) {
+  if (only && meta.id !== only) continue;
+  const base = new URL(`../content/${meta.dir}/`, import.meta.url);
+  let quiz;
+  let exercises;
+  try {
+    quiz = (await import(new URL('quiz.js', base))).default;
+    exercises = (await import(new URL('exercises.js', base))).default;
+  } catch (e) {
+    console.error(`${meta.dir}: cannot load content (${e.message})`);
+    process.exitCode = 1;
+    continue;
+  }
+  for (const ex of exercises) {
+    jobs.push(async () => {
+      const r = await run(ex.lang, ex.solution, ex.tests);
+      if (!r.ok) return `${ex.id}: reference solution fails (${r.phase}) ${r.message} ${failing(r)}`;
+    });
+    jobs.push(async () => {
+      const r = await run(ex.lang, ex.starter, ex.tests);
+      if (r.ok) return `${ex.id}: starter already passes every test, so the tests are too weak`;
+    });
+  }
+  for (const q of quiz.filter((x) => x.type === 'output')) {
+    jobs.push(async () => {
+      const r = await runProgramLocal(q.codeLang, q.code);
+      if (!r.ok) return `${q.id}: output program failed: ${r.stderr.slice(0, 800)}`;
+      const actual = norm(r.stdout);
+      const correct = q.options.find((o) => o.correct);
+      if (norm(correct.text) !== actual) return `${q.id}: correct option is ${JSON.stringify(correct.text)} but the program printed ${JSON.stringify(actual)}`;
+      if (q.options.some((o) => !o.correct && norm(o.text) === actual)) return `${q.id}: a wrong option also matches the real output`;
+    });
+  }
+}
+
+const problems = [];
+let next = 0;
+let done = 0;
+const workers = Math.max(2, Math.min(8, cpus().length));
+await Promise.all(Array.from({ length: workers }, async () => {
+  while (next < jobs.length) {
+    const job = jobs[next++];
+    const p = await job();
+    if (p) problems.push(p);
+    if (++done % 10 === 0 || done === jobs.length) console.log(`  ${done}/${jobs.length} checks`);
+  }
+}));
+
+if (problems.length) {
+  console.error(problems.join('\n'));
+  console.error(`\n${problems.length} problem(s).`);
+  process.exit(1);
+}
+if (process.exitCode) process.exit(process.exitCode);
+console.log('All reference solutions pass, all starters fail, all output MCQs verified.');

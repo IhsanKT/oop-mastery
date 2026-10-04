@@ -1,0 +1,31 @@
+export const TIERS = [
+  { id: 'foundations', title: 'Foundations', blurb: 'Classes, objects, lifetime and encapsulation.' },
+  { id: 'pillars', title: 'The Pillars', blurb: 'Inheritance, polymorphism, abstraction and operators.' },
+  { id: 'deep', title: 'Deep Dive', blurb: "Copy and move, memory, MRO, and each language's object model." },
+  { id: 'design', title: 'Design Mastery', blurb: 'Composition, SOLID and design patterns.' },
+  { id: 'final', title: 'Final', blurb: 'Capstone projects and the mastery exam.' },
+];
+
+export const MODULES = [
+  { id: 'why-oop', num: 1, dir: '01-why-oop', tier: 'foundations', title: 'Why OOP?', summary: 'Procedural vs object-oriented thinking, the four pillars, and how objects live in memory.' },
+  { id: 'classes', num: 2, dir: '02-classes', tier: 'foundations', title: 'Classes & Objects', summary: 'Members, methods, this vs self, instance vs class attributes.' },
+  { id: 'lifetime', num: 3, dir: '03-lifetime', tier: 'foundations', title: 'Constructors, Destructors & Lifetime', summary: 'Initializer lists, delegating and explicit constructors, destruction order, __init__ vs __new__.' },
+  { id: 'encapsulation', num: 4, dir: '04-encapsulation', tier: 'foundations', title: 'Encapsulation', summary: 'Access control, invariants, friend, name mangling and @property.' },
+  { id: 'inheritance', num: 5, dir: '05-inheritance', tier: 'pillars', title: 'Inheritance', summary: 'Constructor chaining, super(), overriding, inheritance access modes and object slicing.' },
+  { id: 'polymorphism', num: 6, dir: '06-polymorphism', tier: 'pillars', title: 'Runtime Polymorphism', summary: 'virtual, override, final, vtables, virtual destructors and duck typing.' },
+  { id: 'abstraction', num: 7, dir: '07-abstraction', tier: 'pillars', title: 'Abstraction & Interfaces', summary: 'Pure virtual functions, abstract classes, abc.ABC and typing.Protocol.' },
+  { id: 'operators', num: 8, dir: '08-operators', tier: 'pillars', title: 'Operator Overloading & Dunders', summary: 'Member vs free operators, <=>, streams, and Python special methods.' },
+  { id: 'static-members', num: 9, dir: '09-static-members', tier: 'pillars', title: 'Static & Class-level Members', summary: 'static data and functions, @classmethod alternate constructors, @staticmethod.' },
+  { id: 'copy-move', num: 10, dir: '10-copy-move', tier: 'deep', title: 'Copy & Move Semantics', summary: 'Shallow vs deep copies, Rule of 3/5/0, move semantics, copy and deepcopy.' },
+  { id: 'memory', num: 11, dir: '11-memory', tier: 'deep', title: 'Memory & RAII', summary: 'Smart pointers, ownership, reference counting, weakref and context managers.' },
+  { id: 'multiple-inheritance', num: 12, dir: '12-multiple-inheritance', tier: 'deep', title: 'Multiple Inheritance & MRO', summary: 'The diamond, virtual inheritance, C3 linearization, cooperative super() and mixins.' },
+  { id: 'cpp-toolbox', num: 13, dir: '13-cpp-toolbox', tier: 'deep', title: 'The C++ Class Toolbox', summary: 'const-correctness, mutable, constexpr, nested classes, conversions and explicit.' },
+  { id: 'python-object-model', num: 14, dir: '14-python-object-model', tier: 'deep', title: 'The Python Object Model', summary: '__slots__, descriptors, attribute hooks, dataclasses and metaclasses.' },
+  { id: 'generics', num: 15, dir: '15-generics', tier: 'deep', title: 'Templates & Generics', summary: 'Class templates, specialization, CRTP, concepts, TypeVar and Generic.' },
+  { id: 'exceptions', num: 16, dir: '16-exceptions', tier: 'deep', title: 'Exceptions & OOP', summary: 'Exception hierarchies, exception safety, catching by reference, raise from.' },
+  { id: 'composition', num: 17, dir: '17-composition', tier: 'design', title: 'Composition & Relationships', summary: 'Has-a vs is-a, delegation, aggregation and UML class diagrams.' },
+  { id: 'solid', num: 18, dir: '18-solid', tier: 'design', title: 'SOLID Principles', summary: 'Five principles, each refactored from bad to good in both languages.' },
+  { id: 'patterns-1', num: 19, dir: '19-patterns-1', tier: 'design', title: 'Design Patterns I', summary: 'Singleton, Factory Method, Builder, Adapter, Decorator, Composite.' },
+  { id: 'patterns-2', num: 20, dir: '20-patterns-2', tier: 'design', title: 'Design Patterns II', summary: 'Strategy, Observer, Command, Template Method, State, Iterator.' },
+  { id: 'mastery', num: 21, dir: '21-mastery', tier: 'final', final: true, title: 'Mastery Capstones', summary: 'Three capstone projects in both languages, plus the final exam.' },
+];
