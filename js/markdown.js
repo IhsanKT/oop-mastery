@@ -53,3 +53,5 @@ export function codeBlock(code, lang) {
   if (window.hljs?.getLanguage(lang)) window.hljs.highlightElement(el);
   return pre;
 }
+
+export const renderInline = (md) => window.marked.parseInline(md ?? '');
