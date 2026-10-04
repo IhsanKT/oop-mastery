@@ -1,6 +1,6 @@
 ## Why inheritance?
 
-Picture a vet clinic app: `Dog` has a name, `describe()` and `vaccinate()`, and you copy most of it into `Cat` and `Rabbit`. Now a bug in `vaccinate()` must be fixed three times, and booking needs three functions, because nothing says "these are all animals". Inheritance fixes both: write the shared part once in `Animal`, and declare that a `Dog` **is an** `Animal`. That gives you two different things:
+Picture a vet clinic app: `Dog` has a name, `describe()` and `vaccinate()`, and you copy most of it into `Cat` and `Rabbit`. Now a bug in `vaccinate()` must be fixed three times. Booking an appointment needs three C++ overloads; Python's duck typing accepts all three pets, but nothing records or checks that they share an interface. Inheritance fixes both: write the shared part once in `Animal`, and declare that a `Dog` **is an** `Animal`. That gives you two different things:
 
 - **Reuse (implementation inheritance).** The derived class gets the base's data members and member functions.
 - **Subtyping (interface inheritance).** A derived object can be used wherever a base object is expected: a `Dog&` converts to `Animal&`, and `isinstance(dog, Animal)` is `True`. Code written once for `Animal` works for every animal, even kinds written later.
@@ -218,7 +218,7 @@ Private base members are still **inherited** (they live inside every derived obj
 
 ## Object slicing
 
-In C++ a variable of class type *is* an object of exactly that type. Passing or assigning a `Dog` **by value** to an `Animal` copies only the `Animal` part, via `Animal`'s copy constructor, which knows nothing about `breed_`.
+In C++ a variable of class type *is* an object of exactly that type. Passing or assigning a `Dog` **by value** to an `Animal` copies only the `Animal` part, via `Animal`'s copy constructor (or copy assignment), which knows nothing about `breed_`.
 
 ~~~cpp
 void show(Animal a) { std::cout << a.describe() << '\n'; }            // slices
@@ -245,7 +245,7 @@ Python cannot slice: variables are references, and passing or assigning never co
 
 ~~~cpp
 static_assert(std::is_base_of_v<Animal, Dog>);        // compile time, about types
-static_assert(std::is_base_of_v<Dog, Dog>);           // a class is its own base
+static_assert(std::is_base_of_v<Dog, Dog>);           // true for the same class too (by the trait's definition)
 static_assert(std::is_convertible_v<Dog*, Animal*>);  // public, unambiguous base only
 // dynamic_cast<Dog*>(p): nullptr if *p is not a Dog; needs a polymorphic base (Module 06)
 ~~~
@@ -283,7 +283,7 @@ C++ `final` is enforced by the compiler; on a virtual function it stops further 
 - **Substitutability (Liskov, Module 18).** Code written for the base must work, unchanged, with any derived object. A square is a rectangle in math, but a *mutable* `Square` that keeps its sides equal breaks `Rectangle`'s promise that width and height change independently:
 
 ~~~cpp
-void stretch(Rectangle& r) {
+void stretch(Rectangle& r) {  // assuming virtual setters (Module 06)
     r.setWidth(10);
     r.setHeight(2);
     assert(r.area() == 20);   // fails if r is a Square that keeps its sides equal
@@ -295,6 +295,8 @@ def stretch(r):
     r.height = 2
     assert r.area() == 20     # fails if r is a Square that keeps its sides equal
 ~~~
+
+  With non-virtual setters, C++ calls `Rectangle`'s versions instead: the assertion passes, but the `Square` silently stops being square. Broken either way.
 
 - **Inherit for substitutability, compose for reuse.** `class Stack(list)` (or `: public std::vector<int>`) inherits `insert`, indexing and more, so any caller can break last-in-first-out order. A stack *has* a list; it is not one (more in Module 17):
 

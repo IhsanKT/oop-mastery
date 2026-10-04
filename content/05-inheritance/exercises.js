@@ -62,7 +62,7 @@ EXPECT_EQ(a.describe(), std::string("Tom is an animal"));` },
 EXPECT_EQ(d.breed(), std::string("beagle"));` },
       { name: 'name() is inherited, not redeclared', code: `Dog d("Rex", "beagle");
 EXPECT_EQ(d.name(), std::string("Rex"));
-EXPECT((std::is_same_v<decltype(&Dog::name), std::string (Animal::*)() const>));` },
+EXPECT((std::is_same_v<decltype(&Dog::name), decltype(&Animal::name)>));` },
       { name: 'Dog::describe extends Animal::describe', code: `EXPECT_EQ(Dog("Rex", "beagle").describe(), std::string("Rex is an animal (a beagle dog)"));
 EXPECT_EQ(Dog("Bella", "collie").describe(), std::string("Bella is an animal (a collie dog)"));` },
       { name: 'a Dog can be used as an Animal', code: `Dog d("Bella", "collie");
@@ -429,6 +429,6 @@ class Square(Rectangle):
 
 **A placeholder in the base.** \`Shape.area()\` raising \`NotImplementedError\` documents that subclasses must override it, but \`Shape("blob")\` can still be created and only fails when \`area()\` is called. Module 07 replaces this with \`abc.ABC\` and \`@abstractmethod\`, which refuse to instantiate \`Shape\` at all.
 
-**Is Square-extends-Rectangle safe here?** Yes, because these shapes are never resized after construction. If \`Rectangle\` let callers change width and height independently, a \`Square\` could no longer keep that promise: that is the Liskov trap from the lesson.`,
+**Is Square-extends-Rectangle safe here?** Only as long as \`width\` and \`height\` are treated as read-only after construction (for example, exposed as read-only properties). They are plain public attributes here, so nothing stops \`sq.width = 5\`, and if \`Rectangle\` invited callers to change width and height independently, a \`Square\` could no longer keep its sides equal: that is the Liskov trap from the lesson.`,
   },
 ];
