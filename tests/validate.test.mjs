@@ -48,8 +48,8 @@ test('flags each schema violation', () => {
 
 test('minimum counts are enforced, final module relaxes quiz rules', () => {
   const errs = validateModule(meta, lesson, [], []).join('\n');
-  assert.match(errs, /≥15 questions/);
-  assert.match(errs, /≥4 exercises/);
+  assert.match(errs, /≥8 questions/);
+  assert.match(errs, /≥2 exercises/);
   const finalMeta = { id: 'demo', dir: '21-demo', final: true };
   const six = [1, 2, 3].map((i) => ex(i, 'cpp')).concat([4, 5, 6].map((i) => ex(i, 'python')));
   assert.deepEqual(validateModule(finalMeta, 'x'.repeat(2000), [], six), []);
