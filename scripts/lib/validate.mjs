@@ -16,7 +16,7 @@ export function validateModule(meta, lesson, quiz, exercises) {
   };
 
   lesson = typeof lesson === 'string' ? lesson : '';
-  const minLesson = final ? 1500 : 3000;
+  const minLesson = final ? 2000 : 6000;
   if (lesson.length < minLesson) err('lesson.md', `must be at least ${minLesson} characters (has ${lesson.length})`);
   if (lesson.includes('```')) err('lesson.md', 'use ~~~ fences, not backticks');
   if (!final) {
@@ -26,8 +26,8 @@ export function validateModule(meta, lesson, quiz, exercises) {
   }
 
   if (!Array.isArray(quiz)) { err('quiz.js', 'default export must be an array'); quiz = []; }
-  if (!final && quiz.length < 8) err('quiz.js', `needs ≥8 questions (has ${quiz.length})`);
-  if (!final && quiz.filter((q) => q?.type === 'output').length < 2) err('quiz.js', 'needs ≥2 output questions');
+  if (!final && quiz.length < 15) err('quiz.js', `needs ≥15 questions (has ${quiz.length})`);
+  if (!final && quiz.filter((q) => q?.type === 'output').length < 3) err('quiz.js', 'needs ≥3 output questions');
   quiz.forEach((q, i) => {
     const w = `quiz[${i}] ${q?.id ?? ''}`.trim();
     checkId(w, q?.id);
@@ -54,7 +54,7 @@ export function validateModule(meta, lesson, quiz, exercises) {
   });
 
   if (!Array.isArray(exercises)) { err('exercises.js', 'default export must be an array'); exercises = []; }
-  const perLang = 1;
+  const perLang = final ? 3 : 2;
   if (exercises.length < perLang * 2) err('exercises.js', `needs ≥${perLang * 2} exercises (has ${exercises.length})`);
   for (const lang of EX_LANGS) {
     const n = exercises.filter((e) => e?.lang === lang).length;
